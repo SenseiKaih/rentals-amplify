@@ -1,12 +1,16 @@
 // /pages/api/mtn-payment.ts
 import axios from 'axios';
+import { NextApiRequest, NextApiResponse } from 'next';
 
-export default async function handler(req, res) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
     const { amount, phoneNumber, currency } = req.body;
 
-    const mtnPaymentUrl = 'https://sandbox.mtn.com/collection/v1_0/requesttopay';
-    
+    const mtnPaymentUrl = process.env.MTN_PAYMENT_URL;
+    const apiKey = process.env.MTN_API_KEY;
+    const userId = process.env.MTN_USER_ID;
+    const password = process.env.MTN_PASSWORD;
+
     try {
       const response = await axios.post(mtnPaymentUrl, {
         amount,
@@ -20,18 +24,19 @@ export default async function handler(req, res) {
         payeeNote: 'Thank you for your payment',
       }, {
         headers: {
-          'Authorization': `Bearer YOUR_ACCESS_TOKEN`,
-          'X-Reference-Id': 'UUID_FOR_TRANSACTION',
-          'X-Target-Environment': 'sandbox', // Or production for live.
+          'Ocp-Apim-Subscription-Key': apiKey,
+          'X-Reference-Id': 'unique_reference_id',
+          'X-Target-Environment': 'sandbox',
+          'Authorization': `Basic ${Buffer.from(`${userId}:${password}`).toString('base64')}`,
         },
       });
 
-      res.status(200).json(response.data);
+      res.status(200).json({ success: true, data: response.data });
     } catch (error) {
-      res.status(500).json({ error: 'Payment failed', details: error });
+      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+      res.status(500).json({ success: false, error: errorMessage });
     }
   } else {
-    res.setHeader('Allow', ['POST']);
-    res.status(405).end(`Method ${req.method} Not Allowed`);
+    res.status(405).json({ success: false, message: 'Method not allowed' });
   }
 }

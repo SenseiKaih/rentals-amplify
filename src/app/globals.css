@@ -4,7 +4,18 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #000000;
+  --primary-foreground: #ffffff;
+  --secondary: #000000;
+  --tertiary: #76ef45
+}
+
+.dark {
+  --background: #1a202c;
+  --foreground: #ffffff;
+  --primary-foreground: #000000;
+  --secondary: #000000;
+  --tertiary: #76ef45
 }
 
 @media (prefers-color-scheme: dark) {
@@ -20,8 +31,31 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+.bg-background {
+  background: var(--background);
+}
+
+.text-foreground {
+  color: var(--foreground);
+}
+
+.bg-secondary {
+  background-color: var(--secondary);
+}
+
+.text-primary-foreground {
+  color: var(--primary-foreground);
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+}
+
+/* Add this to your global CSS file */
+@media (min-width: 768px) {
+  #mobile-menu {
+    display: none;
   }
 }

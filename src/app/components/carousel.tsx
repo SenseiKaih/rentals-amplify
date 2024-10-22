@@ -1,6 +1,8 @@
+// src/components/Carousel.tsx
 "use client"
 
 import * as React from "react"
+import { ChevronLeft, ChevronRight } from "lucide-react"
 import { cn } from "../lib/utils"
 
 export interface CarouselProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -19,38 +21,41 @@ const Carousel = React.forwardRef<HTMLDivElement, CarouselProps>(
       return () => clearInterval(timer)
     }, [items.length, interval])
 
+    const handlePrev = () => {
+      setCurrentIndex((prevIndex) => (prevIndex === 0 ? items.length - 1 : prevIndex - 1))
+    }
+
+    const handleNext = () => {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % items.length)
+    }
+
     return (
-      <div
-        ref={ref}
-        className={cn("relative w-full overflow-hidden", className)}
-        {...props}
-      >
-        <div
-          className="flex transition-transform duration-500"
-          style={{ transform: `translateX(-${currentIndex * 100}%)` }}
-        >
-          {items.map((item, index) => (
-            <div key={index} className="w-full flex-shrink-0">
-              {item}
+      <div className={cn("relative p-4 bg-white mt-2", className)} ref={ref} {...props}>
+        <div className="flex items-center">
+          <button onClick={handlePrev} className="p-2">
+            <ChevronLeft className="h-6 w-6 text-gray-900" />
+          </button>
+          <div className="flex overflow-hidden w-full">
+            <div
+              className="flex transition-transform duration-1000 ease-in-out"
+              style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+            >
+              {items.map((item, index) => (
+                <div key={index} className="min-w-full p-4">
+                  {item}
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-        <div className="absolute bottom-0 left-0 right-0 flex justify-center p-2">
-          {items.map((_, index) => (
-            <button
-              key={index}
-              className={cn(
-                "h-2 w-2 rounded-full mx-1",
-                currentIndex === index ? "bg-primary" : "bg-gray-300"
-              )}
-              onClick={() => setCurrentIndex(index)}
-            />
-          ))}
+          </div>
+          <button onClick={handleNext} className="p-2">
+            <ChevronRight className="h-6 w-6 text-gray-900" />
+          </button>
         </div>
       </div>
     )
   }
 )
+
 Carousel.displayName = "Carousel"
 
-export { Carousel }
+export default Carousel
