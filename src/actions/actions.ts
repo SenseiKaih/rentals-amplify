@@ -154,6 +154,16 @@ export async function updateEquipmentAvailability(id: string, availability: bool
 
 import { NextApiRequest, NextApiResponse } from 'next'
 
+class PushSubscription {
+  async save(email: string): Promise<void> {
+    // Logic to save email to DynamoDB
+    await putItem({
+      TableName: process.env.DYNAMODB_TABLE_NAME as string,
+      Item: { email }
+    })
+  }
+}
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { email } = req.body;
   if (!email) {
@@ -162,7 +172,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   // Call to DynamoDB  to save email
   const pushSubscription = new PushSubscription(); // Create an instance of PushSubscription
-  pushSubscription.save(email); // Assuming save is a method to store the email in DB
+  await pushSubscription.save(email); // Assuming save is a method to store the email in DB
 
   res.status(200).json({ message: 'Subscribed successfully' });
 }
